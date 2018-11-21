@@ -1,0 +1,8 @@
+language: python
+
+deploy:
+  provider: pypi
+  user: "tomerpet@gmail.com"
+  password:
+  on:
+      branch:master
