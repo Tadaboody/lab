@@ -1,4 +1,4 @@
-# Lab
+# Lab [![Build Status](https://travis-ci.com/Tadaboody/lab.svg?branch=master)](https://travis-ci.com/Tadaboody/lab)
 A partial port of [hub](https://www.github.com/github/hub) but for gitlab
 
 ## Install
