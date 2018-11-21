@@ -16,7 +16,8 @@ class Lab:
 
     def __remote_link(self) -> str:
         full_url = next(self.__repo.remote(name='gitlab').urls)
-        return full_url[:-len('.git')] # Strip also removes the git from the start
+        # Strip also removes the git from the start
+        return full_url[:-len('.git')]
 
     def __project_id(self) -> Tuple[str, str]:
         match = re.match(r'git@gitlab.com:([^/]+)/(.+)', self.__remote_link())
@@ -38,9 +39,13 @@ class Lab:
     def issue(self, limit: int = 20):
         resp = self.__get(self.endpoint('issues'), params={'state': 'opened'})
         for issue in resp.json():
-            yield  f"#{issue['iid']}    {issue['title']}" 
+            yield f"#{issue['iid']}    {issue['title']}"
+
+
+def main():
+    from os import environ
+    Fire(Lab(environ.get('GITLAB_ACCESS_TOKEN', None), Path.cwd()), name='lab')
 
 
 if __name__ == '__main__':
-    from os import environ
-    Fire(Lab(environ.get('GITLAB_ACCESS_TOKEN', None), Path.cwd()), name='lab')
+    main()
