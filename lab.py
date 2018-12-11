@@ -1,4 +1,5 @@
 import re
+from os import environ
 from pathlib import Path
 from typing import Tuple
 
@@ -8,19 +9,21 @@ import requests
 
 
 class Lab:
-    def __init__(self, token: str, dir: Path):
-        self.__token = token
+    def __init__(self, token=None, dir: Path = Path.cwd(), remote='origin'):
+        self.__token = token or environ.get('GITLAB_ACCESS_TOKEN', None)
         self.__dir = dir
         self.__repo = git.Repo(dir)
         self.__client = requests.Session()
+        self.__remote_name = remote
 
     def __remote_link(self) -> str:
-        full_url = next(self.__repo.remote(name='gitlab').urls)
+        full_url = next(self.__repo.remote(self.__remote_name).urls)
         # Strip also removes the git from the start
         return full_url[:-len('.git')]
 
     def __project_id(self) -> Tuple[str, str]:
-        match = re.match(r'git@gitlab.com:([^/]+)/(.+)', self.__remote_link())
+        match = re.match(r'git@gitlab.com:([^/]+)/(.+)', self.__remote_link()) or re.match(
+            r'http[s]?://gitlab.com:([^/]+)/(.+)', self.__remote_link())
         return match[1], match[2].strip('.git')
 
     def __api_link(self) -> str:
@@ -43,8 +46,7 @@ class Lab:
 
 
 def main():
-    from os import environ
-    Fire(Lab(environ.get('GITLAB_ACCESS_TOKEN', None), Path.cwd()), name='lab')
+    Fire(Lab, name='lab')
 
 
 if __name__ == '__main__':
